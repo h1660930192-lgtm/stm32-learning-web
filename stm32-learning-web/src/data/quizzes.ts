@@ -1,155 +1,151 @@
 import type { Lesson, QuizQuestion } from "../types";
 import { lessons } from "./lessons";
 
-function keywords(...items: string[]) {
-  return items.flatMap((item) => item.split(/[、，, /]+/)).filter(Boolean);
+function q(
+  day: number,
+  index: number,
+  input: Omit<QuizQuestion, "id">
+): QuizQuestion {
+  return { id: `d${day}-q${index}`, ...input };
 }
 
-function cCodeQuestion(day: number): Pick<QuizQuestion, "code" | "answer" | "keywords" | "explanation" | "review"> {
-  const table: Record<number, [string, string, string[]]> = {
-    1: ['int t = 65;\nif (t > 60) printf("ALARM\\n");', "输出 ALARM，因为 65 大于 60。", ["ALARM", "65", "大于"]],
-    2: ['int sum = 0;\nfor (int i = 1; i <= 3; i++) sum += i;\nprintf("%d\\n", sum);', "输出 6。", ["6"]],
-    3: ['int a[3] = {2, 5, 1};\nprintf("%d\\n", a[1]);', "输出 5，因为 a[1] 是第二个元素。", ["5", "第二"]],
-    4: ['int add(int a, int b) { return a + b; }\nprintf("%d\\n", add(2, 3));', "输出 5。", ["5"]],
-    5: ['int x = 10;\nint *p = &x;\n*p = 20;\nprintf("%d\\n", x);', "输出 20，因为 *p 修改了 x。", ["20", "修改"]],
-    6: ['typedef struct { int alarm; } State;\nState s = {1};\nprintf("%d\\n", s.alarm);', "输出 1。", ["1"]],
-    7: ["int samples[3] = {10, 20, 30};\n/* 平均值是多少？ */", "平均值是 20。", ["20", "平均"]],
+function beginnerQuiz(day: number): QuizQuestion[] {
+  const table: Record<number, QuizQuestion[]> = {
+    1: [
+      q(1, 1, { type: "single", title: "程序入口", question: "C 程序通常从哪里开始执行？", options: ["printf", "main", "return", "#include"], answer: "B", explanation: "程序通常从 main 函数开始执行。", review: "复习 Day 1 的最小程序骨架。" }),
+      q(1, 2, { type: "judge", title: "printf", question: "printf 的作用是把内容输出到屏幕。", answer: "对", explanation: "printf 负责输出。", review: "复习 printf。" }),
+      q(1, 3, { type: "short", title: "return 0", question: "return 0 大概表示什么？", answer: "程序正常结束", keywords: ["正常", "结束"], explanation: "return 0 表示程序正常结束。", review: "复习 main 函数。" }),
+      q(1, 4, { type: "code-reading", title: "读代码", question: "下面代码会输出什么？", code: 'printf("Hello C\\n");', answer: "Hello C", keywords: ["hello c"], explanation: "双引号里的文字会被输出。", review: "复习 printf。" }),
+      q(1, 5, { type: "fill", title: "代码填空", question: "一条普通 C 语句常常以符号 ___ 结束。", answer: ";", explanation: "分号表示一条语句结束。", review: "复习关键符号。" }),
+    ],
+    2: [
+      q(2, 1, { type: "single", title: "数据类型", question: "保存整数年龄更适合用哪种类型？", options: ["int", "float", "char", "main"], answer: "A", explanation: "年龄通常用 int。", review: "复习 int / float / char。" }),
+      q(2, 2, { type: "judge", title: "赋值", question: "在 C 里，= 常用于把右边的值保存到左边变量。", answer: "对", explanation: "= 表示赋值。", review: "复习变量赋值。" }),
+      q(2, 3, { type: "short", title: "float", question: "温度 26.5 更适合用 int 还是 float？", answer: "float", keywords: ["float"], explanation: "带小数的温度更适合 float。", review: "复习数据类型。" }),
+      q(2, 4, { type: "code-reading", title: "读代码", question: "下面代码输出什么？", code: "int a = 10;\nprintf(\"%d\", a);", answer: "10", keywords: ["10"], explanation: "a 保存 10，所以输出 10。", review: "复习变量和值。" }),
+      q(2, 5, { type: "fill", title: "代码填空", question: "保存单个字符 A 可以写 char grade = ___;", answer: "'A'", explanation: "char 使用单引号。", review: "复习 char。" }),
+    ],
+    3: [
+      q(3, 1, { type: "judge", title: "scanf 与 &", question: "scanf 输入普通变量时，通常需要在变量名前加 &。", answer: "对", explanation: "& 表示变量地址，scanf 需要知道把输入放到哪里。", review: "重点复习 scanf 与 &。" }),
+      q(3, 2, { type: "single", title: "&a", question: "&a 表示什么？", options: ["变量 a 的值", "变量 a 的地址", "变量 a 的类型", "删除变量 a"], answer: "B", explanation: "&a 表示 a 的地址。", review: "复习值和地址。" }),
+      q(3, 3, { type: "short", title: "printf / scanf", question: "printf 和 scanf 谁负责输入？", answer: "scanf", keywords: ["scanf"], explanation: "scanf 负责输入，printf 负责输出。", review: "复习输入输出。" }),
+      q(3, 4, { type: "code-reading", title: "正确写法", question: "哪一行更适合读取普通整数变量 a？", code: 'scanf("%d", a);\nscanf("%d", &a);', answer: "第二行", keywords: ["第二", "&a"], explanation: "第二行传入了 a 的地址。", review: "复习 scanf 的正确写法。" }),
+      q(3, 5, { type: "fill", title: "代码填空", question: 'scanf("%d", ___a);', answer: "&", explanation: "普通变量前需要 &。", review: "复习 &。" }),
+    ],
+    4: [
+      q(4, 1, { type: "single", title: "相等判断", question: "判断 a 是否等于 10，应该用哪个符号？", options: ["=", "==", ">", "<"], answer: "B", explanation: "== 表示比较是否相等。", review: "复习判断符号。" }),
+      q(4, 2, { type: "judge", title: "边界", question: "“及格线 60 分及以上”可以写成 score >= 60。", answer: "对", explanation: "及以上包含 60。", review: "复习边界值。" }),
+      q(4, 3, { type: "short", title: "else", question: "if 条件不成立时，常用哪个分支处理另一种情况？", answer: "else", keywords: ["else"], explanation: "else 处理条件不成立时的逻辑。", review: "复习 if / else。" }),
+      q(4, 4, { type: "code-reading", title: "读代码", question: "score=59 时输出什么？", code: 'if (score >= 60) printf("PASS"); else printf("FAIL");', answer: "FAIL", keywords: ["fail"], explanation: "59 小于 60。", review: "复习 if 判断。" }),
+      q(4, 5, { type: "fill", title: "代码填空", question: "条件不成立时可进入 ___ 分支。", answer: "else", explanation: "else 表示否则。", review: "复习 if / else。" }),
+    ],
+    5: [
+      q(5, 1, { type: "single", title: "for 三部分", question: "for 循环中常负责让 i 每轮加 1 的是？", options: ["i = 1", "i <= 10", "i++", "printf"], answer: "C", explanation: "i++ 负责更新循环变量。", review: "复习 for 的三部分。" }),
+      q(5, 2, { type: "judge", title: "死循环", question: "如果循环变量一直不更新，程序可能停不下来。", answer: "对", explanation: "条件一直满足就会持续循环。", review: "复习死循环。" }),
+      q(5, 3, { type: "short", title: "sum", question: "求和前，sum 常常应该先初始化成多少？", answer: "0", keywords: ["0"], explanation: "累加器通常从 0 开始。", review: "复习累加器。" }),
+      q(5, 4, { type: "code-reading", title: "读代码", question: "下面循环会输出几次？", code: "for (int i = 0; i < 3; i++) printf(\"Hi\\n\");", answer: "3", keywords: ["3"], explanation: "i 为 0、1、2 时各执行一次。", review: "复习循环边界。" }),
+      q(5, 5, { type: "fill", title: "代码填空", question: "for 循环里 i++ 表示 i 每轮 ___ 1。", answer: "加", explanation: "++ 表示自增 1。", review: "复习 ++。" }),
+    ],
+    6: [
+      q(6, 1, { type: "single", title: "while", question: "while 更适合哪类场景？", options: ["次数完全不确定的重复", "永远不执行", "只能输出文字", "定义结构体"], answer: "A", explanation: "while 适合条件驱动的循环。", review: "复习 while。" }),
+      q(6, 2, { type: "judge", title: "while(1)", question: "while(1) 在单片机里通常表示持续运行的主循环。", answer: "对", explanation: "单片机常常需要一直工作。", review: "复习主循环。" }),
+      q(6, 3, { type: "short", title: "更新变量", question: "while 循环里如果忘了更新 i，可能发生什么？", answer: "死循环", keywords: ["死循环", "停不下来"], explanation: "条件一直满足就可能死循环。", review: "复习循环更新。" }),
+      q(6, 4, { type: "code-reading", title: "读代码", question: "i 初始为 1，下面代码第一次输出什么？", code: "while (i <= 3) {\n  printf(\"%d\", i);\n  i++;\n}", answer: "1", keywords: ["1"], explanation: "第一次循环时 i 还是 1。", review: "复习 while 执行顺序。" }),
+      q(6, 5, { type: "fill", title: "代码填空", question: "单片机持续运行的主循环常写成 while(___)。", answer: "1", explanation: "while(1) 表示条件恒真。", review: "复习 while(1)。" }),
+    ],
+    7: [
+      q(7, 1, { type: "single", title: "数组下标", question: "长度为 5 的数组，第一个元素下标是？", options: ["0", "1", "4", "5"], answer: "A", explanation: "数组下标从 0 开始。", review: "复习数组下标。" }),
+      q(7, 2, { type: "judge", title: "越界", question: "数组 int a[5] 的合法下标是 0 到 4。", answer: "对", explanation: "a[5] 已经越界。", review: "复习数组边界。" }),
+      q(7, 3, { type: "short", title: "应用", question: "数组为什么适合保存多次温度采样？", answer: "可以保存一组同类型数据", keywords: ["一组", "同类型", "多次"], explanation: "数组能保存一组同类型数据。", review: "复习数组用途。" }),
+      q(7, 4, { type: "code-reading", title: "读代码", question: "下面代码输出什么？", code: "int a[3] = {10, 20, 30};\nprintf(\"%d\", a[0]);", answer: "10", keywords: ["10"], explanation: "a[0] 是第一个元素。", review: "复习下标。" }),
+      q(7, 5, { type: "fill", title: "代码填空", question: "访问数组第一个元素常写成 a[___]。", answer: "0", explanation: "第一个下标是 0。", review: "复习数组。" }),
+    ],
+    8: [
+      q(8, 1, { type: "single", title: "函数调用", question: "下面哪一个像函数调用？", options: ["int add", "return", "add(2, 3)", "int a"], answer: "C", explanation: "add(2, 3) 是调用函数。", review: "复习定义和调用。" }),
+      q(8, 2, { type: "judge", title: "return", question: "函数可以通过 return 把结果交回去。", answer: "对", explanation: "return 用于返回结果。", review: "复习函数返回值。" }),
+      q(8, 3, { type: "short", title: "参数", question: "add(int a, int b) 里的 a、b 叫什么？", answer: "参数", keywords: ["参数"], explanation: "a、b 是参数。", review: "复习函数参数。" }),
+      q(8, 4, { type: "code-reading", title: "读代码", question: "add(2, 3) 返回什么？", code: "int add(int a, int b) {\n  return a + b;\n}", answer: "5", keywords: ["5"], explanation: "2 + 3 = 5。", review: "复习函数调用。" }),
+      q(8, 5, { type: "fill", title: "代码填空", question: "把结果交回去常用关键字 ___。", answer: "return", explanation: "return 表示返回。", review: "复习 return。" }),
+    ],
+    9: [
+      q(9, 1, { type: "single", title: "地址", question: "&a 表示什么？", options: ["a 的值", "a 的地址", "a 的类型", "a 的长度"], answer: "B", explanation: "&a 表示地址。", review: "复习地址概念。" }),
+      q(9, 2, { type: "judge", title: "指针", question: "指针变量可以用来保存地址。", answer: "对", explanation: "这是指针最基础的定义。", review: "复习指针。" }),
+      q(9, 3, { type: "short", title: "*p", question: "*p 大概表示什么？", answer: "通过地址访问数据", keywords: ["地址", "数据"], explanation: "*p 用来通过地址访问数据。", review: "复习 *。" }),
+      q(9, 4, { type: "code-reading", title: "读代码", question: "最终 a 的值是多少？", code: "int a = 10;\nint *p = &a;\n*p = 20;", answer: "20", keywords: ["20"], explanation: "*p 修改的就是 a 所在位置的数据。", review: "复习指针修改变量。" }),
+      q(9, 5, { type: "fill", title: "代码填空", question: "scanf 读取普通变量 a 时常写 scanf(\"%d\", ___a);", answer: "&", explanation: "需要传地址。", review: "复习 scanf 与地址。" }),
+    ],
+    10: [
+      q(10, 1, { type: "single", title: "结构体", question: "结构体主要用来做什么？", options: ["打包多个相关数据", "删除变量", "替代 main", "只保存字符"], answer: "A", explanation: "结构体能把相关字段放在一起。", review: "复习结构体。" }),
+      q(10, 2, { type: "judge", title: "HAL 句柄", question: "UART_HandleTypeDef 本质上也是结构体类型。", answer: "对", explanation: "HAL 中大量使用结构体。", review: "复习 HAL 与结构体。" }),
+      q(10, 3, { type: "short", title: "成员访问", question: "普通结构体变量访问成员常用什么符号？", answer: ".", keywords: ["."], explanation: "普通结构体变量常用点号访问成员。", review: "复习成员访问。" }),
+      q(10, 4, { type: "code-reading", title: "读代码", question: "s.score 的值是多少？", code: "typedef struct { int score; } Student;\nStudent s = {95};", answer: "95", keywords: ["95"], explanation: "初始化时 score 被设成 95。", review: "复习结构体初始化。" }),
+      q(10, 5, { type: "fill", title: "代码填空", question: "把 age 和 score 放在一起，可以定义一个 ___。", answer: "结构体", explanation: "结构体适合打包多个相关数据。", review: "复习结构体用途。" }),
+    ],
   };
-  const [code, explanation, kw] = table[day] ?? table[1];
-  return { code, answer: explanation, keywords: kw, explanation, review: "复习变量变化过程和 C 语言基础语法。" };
+  return table[day];
 }
 
-function stm32CodeQuestion(day: number): Pick<QuizQuestion, "code" | "answer" | "keywords" | "explanation" | "review"> {
-  const table: Record<number, [string, string, string[]]> = {
-    8: ["HAL_Init();\nSystemClock_Config();\nMX_GPIO_Init();", "先初始化 HAL、系统时钟和 GPIO。", ["初始化", "HAL", "时钟", "GPIO"]],
-    9: ["HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);\nHAL_Delay(500);", "翻转 LED，然后延时 500ms。", ["翻转", "LED", "500"]],
-    10: ["HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin);", "读取按键引脚电平。", ["读取", "按键", "电平"]],
-    11: ["void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) { ... }", "GPIO 外部中断回调函数。", ["中断", "回调", "EXTI"]],
-    12: ["HAL_UART_Transmit(&huart1, msg, len, 100);", "通过 huart1 对应串口发送数据。", ["串口", "发送", "huart1"]],
-    13: ["HAL_TIM_Base_Start_IT(&htim2);", "启动 TIM2 基本定时器中断。", ["启动", "定时器", "中断"]],
-    14: ["__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 500);", "设置 PWM 比较值，影响占空比。", ["PWM", "比较", "占空比"]],
-  };
-  const [code, explanation, kw] = table[day] ?? table[9];
-  return { code, answer: explanation, keywords: kw, explanation, review: "复习 HAL 函数参数、CubeMX 配置和 USER CODE 区域。" };
-}
-
-function projectCodeQuestion(day: number): Pick<QuizQuestion, "code" | "answer" | "keywords" | "explanation" | "review"> {
-  if (day <= 17) {
-    return {
-      code: "voltage = raw * 3.3f / 4095.0f;",
-      answer: "把 ADC 原始值 raw 换算成电压。",
-      keywords: ["ADC", "电压", "换算", "raw"],
-      explanation: "12 位 ADC 常见范围是 0-4095，乘参考电压后得到实际电压。",
-      review: "复习 ADC 原始值、电压换算和平均滤波。",
-    };
-  }
-  if (day <= 20) {
-    return {
-      code: "page = (page + 1) % 3;",
-      answer: "页面编号循环切换到下一页。",
-      keywords: ["页面", "切换", "循环"],
-      explanation: "page 到 2 后再加 1 会回到 0，适合三页循环显示。",
-      review: "复习 OLED 页面状态和按键切换逻辑。",
-    };
-  }
-  if (day <= 23) {
-    return {
-      code: "alarm = sensor_value > threshold;",
-      answer: "判断传感器值是否超过阈值，得到报警状态。",
-      keywords: ["报警", "阈值", "超过"],
-      explanation: "报警状态应统一保存，显示、蜂鸣器和日志都读取同一份状态。",
-      review: "复习阈值判断、蜂鸣器输出和串口日志。",
-    };
-  }
-  return {
-    code: "采集 -> 滤波 -> 判断 -> 显示 -> 报警 -> 日志",
-    answer: "这是综合项目的数据流。",
-    keywords: ["采集", "滤波", "显示", "报警", "日志"],
-    explanation: "综合项目要按数据流拆模块，避免功能互相缠在一起。",
-    review: "复习综合项目模块拆解和简历表达。",
-  };
-}
-
-function fillQuestion(day: number): Pick<QuizQuestion, "question" | "answer" | "explanation" | "review"> {
-  const table: Record<number, [string, string, string]> = {
-    1: ['scanf("%d", ___temperature);', "&", "scanf 读取普通变量要传地址。"],
-    2: ["for (int i = 1; i ___ 100; i++)", "<=", "求 1 到 100 包含 100。"],
-    3: ["int values[5]; 第一个元素是 values[___]", "0", "数组下标从 0 开始。"],
-    4: ["int get_max(int a, int b) { ___ a > b ? a : b; }", "return", "非 void 函数要返回结果。"],
-    5: ["swap(___x, ___y);", "&", "交换函数需要传变量地址。"],
-    6: ["访问普通结构体变量成员使用符号 ___", ".", "普通结构体变量用点号访问成员。"],
-    7: ["sum / (float)len 是为了避免 ___ 除法。", "整数", "强转为 float 可以保留小数。"],
-    8: ["用户代码应写在 USER CODE ___ 和 USER CODE END 之间。", "BEGIN", "CubeMX 会保留 USER CODE 区域。"],
-    9: ["翻转 GPIO 输出使用 HAL_GPIO_ ___ Pin。", "Toggle", "TogglePin 表示翻转当前电平。"],
-    10: ["读取 GPIO 输入使用 HAL_GPIO_ ___ Pin。", "Read", "ReadPin 返回引脚电平。"],
-    11: ["外部中断需要在 CubeMX 中启用 ___。", "NVIC", "NVIC 控制中断使能和优先级。"],
-    12: ["HAL_UART_Transmit 的第一个参数常写作 ___huart1。", "&", "传入串口句柄地址。"],
-    13: ["定时器中断启动函数常用 HAL_TIM_Base_Start_ ___。", "IT", "IT 表示 interrupt。"],
-    14: ["PWM 亮度主要由 ___ 值与 ARR 的比例决定。", "比较", "比较值影响占空比。"],
-  };
-  if (day >= 15 && day <= 17) return { question: "ADC 平均滤波通常需要多次采样后求 ___。", answer: "平均", explanation: "平均值能减小随机抖动。", review: "复习 ADC 采集和滤波。" };
-  if (day >= 18 && day <= 20) return { question: "OLED 页面切换常用变量 ___ 保存当前页面编号。", answer: "page", explanation: "page 是页面状态变量。", review: "复习显示页面状态。" };
-  if (day >= 21 && day <= 23) return { question: "超过阈值后可用 LED 或 ___ 提醒报警。", answer: "蜂鸣器", explanation: "蜂鸣器是常见声报警输出。", review: "复习报警输出。" };
-  if (day >= 24) return { question: "综合项目简历描述应包含外设、数据处理、报警逻辑和 ___ 方法。", answer: "调试", explanation: "串口日志和分模块验证都是调试能力。", review: "复习项目总结。" };
-  const [question, answer, explanation] = table[day] ?? table[1];
-  return { question, answer, explanation, review: "复习今天的最小代码框架。" };
-}
-
-function buildQuiz(lesson: Lesson): QuizQuestion[] {
+function laterQuiz(lesson: Lesson): QuizQuestion[] {
   const concept = lesson.concepts[0];
-  const code = lesson.day <= 7 ? cCodeQuestion(lesson.day) : lesson.day <= 14 ? stm32CodeQuestion(lesson.day) : projectCodeQuestion(lesson.day);
-  const fill = fillQuestion(lesson.day);
-  const coreReview = lesson.day <= 7 ? "复习 C 语言语法和检查清单。" : lesson.day <= 14 ? "复习 CubeMX 配置和 HAL 调用。" : "复习项目数据流和单模块验证。";
+  const review =
+    lesson.phaseId === "mcu"
+      ? "复习单片机与 GPIO 基础概念。"
+      : lesson.phaseId === "stm32"
+        ? "复习本日 STM32 外设最小知识点。"
+        : "复习项目输入、处理、输出和模块化思维。";
 
   return [
-    {
-      id: `d${lesson.day}-q1`,
+    q(lesson.day, 1, {
       type: "single",
-      title: "学习策略",
-      question: `学习“${lesson.title}”时，最推荐的顺序是？`,
-      options: ["先理解概念，再写最小代码，再检查，再变式", "先复制完整答案，再慢慢看", "跳过检查清单", "只背函数名"],
+      title: "今日重点",
+      question: `今天最该先掌握的是哪一项？`,
+      options: [lesson.coreTakeaways[0], "直接复制整段代码", "跳过基础解释", "只背函数名"],
       answer: "A",
-      explanation: "这套助手的目标是把你从“看懂”带回“能自己写”，所以顺序比速度更重要。",
-      review: coreReview,
-    },
-    {
-      id: `d${lesson.day}-q2`,
+      explanation: "零基础路线先抓最小核心，不急着扩展。",
+      review,
+    }),
+    q(lesson.day, 2, {
       type: "judge",
-      title: "是否直接看答案",
-      question: "遇到不会写的练习时，直接看参考代码是最高效的做法。",
-      answer: "错",
-      explanation: "应该先写输入、处理、输出，再逐层看提示。参考代码只在卡住后用于校准。",
-      review: "复习分层提示的使用方式。",
-    },
-    {
-      id: `d${lesson.day}-q3`,
+      title: "学习方法",
+      question: "看懂不等于会写，每天仍然需要自己动手写一点。",
+      answer: "对",
+      explanation: "真正的熟悉来自亲手写和亲手改。",
+      review: "复习学习原则。",
+    }),
+    q(lesson.day, 3, {
       type: "short",
       title: `解释概念：${concept}`,
-      question: `用自己的话解释“${concept}”在今天内容中的作用。`,
-      answer: `它是 ${lesson.title} 的关键概念，用来支撑今天的目标：${lesson.goal}。`,
-      keywords: keywords(concept, lesson.title, lesson.goal),
-      explanation: "简答题不要求背术语，能说清它解决什么问题即可。",
-      review: coreReview,
-    },
-    {
-      id: `d${lesson.day}-q4`,
+      question: `用一句话解释“${concept}”。`,
+      answer: concept,
+      keywords: [concept],
+      explanation: `今天的核心概念之一就是 ${concept}。`,
+      review,
+    }),
+    q(lesson.day, 4, {
       type: "code-reading",
       title: "代码阅读",
-      question: "阅读代码，说明它大概做什么或输出什么。",
-      ...code,
-    },
-    {
-      id: `d${lesson.day}-q5`,
+      question: "这段代码和今天主题有什么关系？",
+      code: lesson.codeExamples[0]?.code ?? "",
+      answer: lesson.codeExamples[0]?.solves ?? lesson.goal,
+      keywords: [lesson.title, concept],
+      explanation: lesson.codeExamples[0]?.solves ?? lesson.goal,
+      review,
+    }),
+    q(lesson.day, 5, {
       type: "fill",
-      title: "代码填空",
-      ...fill,
-    },
+      title: "关键字填空",
+      question: `今天的主题是“${lesson.title}”，请填写一个关键词：___`,
+      answer: concept,
+      explanation: `可从今天概念中记住 ${concept}。`,
+      review,
+    }),
   ];
 }
 
-export const quizzes = Object.fromEntries(lessons.map((lesson) => [lesson.day, buildQuiz(lesson)])) as Record<number, QuizQuestion[]>;
+export const quizzes = Object.fromEntries(
+  lessons.map((lesson) => [lesson.day, lesson.day <= 10 ? beginnerQuiz(lesson.day) : laterQuiz(lesson)])
+) as Record<number, QuizQuestion[]>;
 
 export function getQuiz(day: number) {
   return quizzes[day] ?? quizzes[1];
 }
-

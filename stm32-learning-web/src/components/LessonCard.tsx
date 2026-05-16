@@ -10,6 +10,7 @@ interface LessonCardProps {
 
 const phaseTone = {
   c: "from-cyan-300/20 to-sky-400/10 text-cyan-100",
+  mcu: "from-emerald-300/20 to-cyan-300/10 text-emerald-100",
   stm32: "from-blue-300/20 to-indigo-400/10 text-blue-100",
   project: "from-violet-300/20 to-emerald-300/10 text-violet-100",
 };
@@ -34,7 +35,7 @@ export function LessonCard({ lesson, completed, active, onOpen }: LessonCardProp
       </div>
       <p className="min-h-12 text-sm leading-6 text-slate-300">{lesson.goal}</p>
       <div className="mt-4 flex flex-wrap gap-2">
-        <span className={`rounded-full bg-gradient-to-r px-3 py-1 text-xs ${phaseTone[lesson.phaseId]}`}>{lesson.phase.replace(/^第.阶段：/, "")}</span>
+        <span className={`rounded-full bg-gradient-to-r px-3 py-1 text-xs ${phaseTone[lesson.phaseId]}`}>{lesson.phase.replace(/^阶段 \d：/, "")}</span>
         <span className="rounded-full bg-white/[0.08] px-3 py-1 text-xs text-slate-300">{lesson.difficulty}</span>
         <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.08] px-3 py-1 text-xs text-slate-300">
           <Clock3 className="h-3.5 w-3.5" aria-hidden />
@@ -47,4 +48,3 @@ export function LessonCard({ lesson, completed, active, onOpen }: LessonCardProp
     </button>
   );
 }
-

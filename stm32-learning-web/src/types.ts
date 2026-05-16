@@ -1,13 +1,29 @@
-export type PhaseId = "c" | "stm32" | "project";
+export type PhaseId = "c" | "mcu" | "stm32" | "project";
 export type ViewId = "dashboard" | "roadmap" | "lesson" | "quiz" | "project";
 export type Difficulty = "入门" | "基础" | "进阶" | "综合";
+export type CodeKind = "c" | "hal";
+
+export interface CodeExample {
+  title: string;
+  kind: CodeKind;
+  code: string;
+  solves: string;
+  lineByLine: string[];
+  symbols: string[];
+  ownership?: string;
+}
 
 export interface PracticeExercise {
   id: string;
   title: string;
   prompt: string;
+  explanation: string;
+  inputExample: string;
+  outputExample: string;
+  keyPoint: string;
   hint: string;
   detailedHint: string;
+  pseudocode: string[];
   referenceCode: string;
   codeNote: string;
   checklist: string[];
@@ -24,12 +40,13 @@ export interface Lesson {
   difficulty: Difficulty;
   duration: string;
   objectives: string[];
+  coreTakeaways: string[];
   concepts: string[];
+  beginnerMisunderstandings: string[];
   comparison51: string[];
   stm32Implementation: string[];
   cubemxTips: string[];
-  codeFramework: string;
-  codeExplanation: string;
+  codeExamples: CodeExample[];
   exercises: PracticeExercise[];
   selfTest: string[];
   commonErrors: string[];
@@ -71,6 +88,9 @@ export interface ProgressState {
   quizScores: Record<number, QuizResult>;
   projectTasks: Record<string, boolean>;
   notes: Record<number, string>;
+  weakPoints: string[];
+  confidenceLevel: number;
+  lastStudyDate: string;
   activity: ActivityItem[];
 }
 
@@ -79,7 +99,7 @@ export interface ProjectPhase {
   dayRange: string;
   title: string;
   goal: string;
+  prerequisites: string[];
   tasks: string[];
   deliverable: string;
 }
-

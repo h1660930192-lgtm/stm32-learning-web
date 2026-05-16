@@ -23,9 +23,9 @@ function RoadmapView({
   return (
     <div className="space-y-8">
       <div>
-        <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">28 天路线</div>
-        <h1 className="mt-3 text-3xl font-bold text-white md:text-5xl">从 C 恢复到项目实战</h1>
-        <p className="mt-4 max-w-3xl text-base leading-8 text-slate-300">每一天都包含目标、概念、51 类比、CubeMX 提示、练习和检查清单。点击任意 Day 进入详情。</p>
+        <div className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">35 天路线</div>
+        <h1 className="mt-3 text-3xl font-bold text-white md:text-5xl">从 C 重新入门到 STM32 项目</h1>
+        <p className="mt-4 max-w-3xl text-base leading-8 text-slate-300">每一天都尽量只抓最少的核心知识，再配合练习、误解提醒和逐行解释。点击任意 Day 进入详情。</p>
       </div>
       {phaseRanges.map((phase) => {
         const phaseLessons = lessons.filter((lesson) => lesson.phaseId === phase.id);
@@ -161,4 +161,3 @@ export default function App() {
     </div>
   );
 }
-

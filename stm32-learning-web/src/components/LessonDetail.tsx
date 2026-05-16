@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronLeft, ClipboardCheck, Save } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ClipboardCheck, Save, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getQuiz } from "../data/quizzes";
 import type { Lesson, QuizResult } from "../types";
@@ -66,21 +66,61 @@ export function LessonDetail({ lesson, completed, note, savedQuiz, onBack, onCom
         </div>
       </div>
 
+      <section className="glass-card rounded-3xl p-5">
+        <h2 className="section-title">今天只要掌握这 3 件事</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {lesson.coreTakeaways.map((item, index) => (
+            <div key={item} className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.08] p-4">
+              <div className="text-xs font-semibold text-cyan-200">0{index + 1}</div>
+              <div className="mt-2 text-sm leading-6 text-white">{item}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <div className="grid gap-5 lg:grid-cols-2">
         <InfoList title="今日目标" items={lesson.objectives} />
         <InfoList title="你需要先理解的概念" items={lesson.concepts} />
-        <InfoList title="和 51 单片机的类比" items={lesson.comparison51} />
+        <InfoList title="和 51 / 单片机场景的连接" items={lesson.comparison51} />
         <InfoList title="STM32 中对应的实现方式" items={lesson.stm32Implementation} />
         <InfoList title="CubeMX 配置提示" items={lesson.cubemxTips} />
         <InfoList title="常见错误" items={lesson.commonErrors} />
       </div>
 
+      <section className="glass-card rounded-3xl border border-amber-300/20 bg-amber-300/[0.08] p-5">
+        <div className="mb-3 flex items-center gap-2 font-semibold text-white">
+          <TriangleAlert className="h-5 w-5 text-amber-200" aria-hidden />
+          初学者容易误解
+        </div>
+        <ul className="space-y-2 text-sm leading-6 text-amber-50">
+          {lesson.beginnerMisunderstandings.map((item) => (
+            <li key={item} className="flex gap-2">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-200" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section className="space-y-4">
         <div>
-          <h2 className="section-title">最小代码框架</h2>
-          <p className="muted mt-1">代码示例保持短小，先用于理解结构，再按你的板子和工程配置修改。</p>
+          <h2 className="section-title">代码展示</h2>
+          <p className="muted mt-1">每段代码都尽量短，并说明它解决什么问题、每一行做什么、关键符号是什么意思。</p>
         </div>
-        <CodeBlock code={lesson.codeFramework} note={lesson.codeExplanation} />
+        {lesson.codeExamples.map((example) => (
+          <div key={example.title} className="space-y-3">
+            <CodeBlock
+              code={example.code}
+              language={example.kind === "c" ? "C" : "STM32 HAL"}
+              title={example.title}
+              note={`${example.solves}${example.ownership ? ` ${example.ownership}` : ""}`}
+            />
+            <div className="grid gap-3 lg:grid-cols-2">
+              <InfoList title="逐行解释" items={example.lineByLine} />
+              <InfoList title="关键符号" items={example.symbols.length ? example.symbols : ["这段没有额外新符号，先关注整体流程。"]} />
+            </div>
+          </div>
+        ))}
       </section>
 
       <PracticePanel exercises={lesson.exercises} />
@@ -94,7 +134,7 @@ export function LessonDetail({ lesson, completed, note, savedQuiz, onBack, onCom
             className="mt-4 min-h-44 w-full resize-y rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm leading-6 text-slate-100 placeholder:text-slate-500"
             value={draftNote}
             onChange={(event) => setDraftNote(event.target.value)}
-            placeholder="例如：今天终于搞清楚 &huart1 是把串口句柄地址传给 HAL。还需要复习指针和结构体指针。"
+            placeholder="例如：今天终于知道 scanf 的 & 不是装饰，而是在传变量地址。"
           />
           <button className="mt-4 secondary-button" onClick={() => onSaveNote(lesson.day, draftNote)} type="button">
             <Save className="h-4 w-4" aria-hidden />
@@ -107,4 +147,3 @@ export function LessonDetail({ lesson, completed, note, savedQuiz, onBack, onCom
     </div>
   );
 }
-

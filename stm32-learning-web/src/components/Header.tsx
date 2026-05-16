@@ -24,7 +24,7 @@ export function Header({ currentDay, activeView, onNavigate, onReset }: HeaderPr
             <BookOpenCheck className="h-5 w-5 text-cyan-200" aria-hidden />
           </div>
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-white md:text-base">STM32 入门学习助手</div>
+            <div className="truncate text-sm font-semibold text-white md:text-base">STM32 零基础入门学习助手</div>
             <div className="text-xs text-slate-400">当前 Day {currentDay} · 浏览器本地保存</div>
           </div>
         </div>
@@ -56,4 +56,3 @@ export function Header({ currentDay, activeView, onNavigate, onReset }: HeaderPr
     </header>
   );
 }
-

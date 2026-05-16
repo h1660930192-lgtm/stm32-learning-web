@@ -8,7 +8,7 @@ interface SidebarProps {
 
 const items: Array<{ id: ViewId; label: string; desc: string; icon: typeof BarChart3 }> = [
   { id: "dashboard", label: "学习仪表盘", desc: "今日任务与进度", icon: BarChart3 },
-  { id: "roadmap", label: "28 天路线", desc: "三阶段学习路径", icon: Route },
+  { id: "roadmap", label: "35 天路线", desc: "四阶段学习路径", icon: Route },
   { id: "lesson", label: "每日任务", desc: "概念、练习、笔记", icon: ClipboardCheck },
   { id: "quiz", label: "每日小测", desc: "5 题即时反馈", icon: Sparkles },
   { id: "project", label: "项目路线", desc: "轨交监测小系统", icon: Blocks },
@@ -22,8 +22,8 @@ export function Sidebar({ activeView, onNavigate }: SidebarProps) {
           <Cpu className="h-6 w-6" aria-hidden />
         </div>
         <div>
-          <div className="font-semibold text-white">STM32 Lab</div>
-          <div className="text-xs text-slate-400">从看懂到能写</div>
+          <div className="font-semibold text-white">STM32 Zero Lab</div>
+          <div className="text-xs text-slate-400">从零基础到能上板</div>
         </div>
       </div>
       <nav className="space-y-2">
@@ -49,9 +49,8 @@ export function Sidebar({ activeView, onNavigate }: SidebarProps) {
         })}
       </nav>
       <div className="mt-8 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-4 text-sm leading-6 text-emerald-100">
-        学习原则：先理解，再写代码，再检查，再做变式。参考代码只用于校准，不用于逃课。
+        学习原则：先补稳基础，再碰外设。看懂不等于会写，先写错再改对很正常。
       </div>
     </aside>
   );
 }
-
